@@ -25,8 +25,8 @@ sudo curl --unix-socket /tmp/firecracker.socket -i \
     -H  'Content-Type: application/json' \
     -d '{
             "snapshot_type": "Full",
-            "snapshot_path": "./../snapshot/snapshot_file",
-            "mem_file_path": "./../snapshot/mem_file"
+            "snapshot_path": "./snapshot/snapshot_file",
+            "mem_file_path": "./snapshot/mem_file"
     }'
 
 # # Capture diff snapshot

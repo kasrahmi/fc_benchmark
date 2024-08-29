@@ -1,17 +1,19 @@
 TAP_DEV="tap0"
 TAP_IP="172.16.0.1"
 MASK_SHORT="/30"
+TAP_MAC="52:82:10:11:19:3b"
 
 # Setup network interface
 sudo ip link del "$TAP_DEV" 2> /dev/null || true
 sudo ip tuntap add dev "$TAP_DEV" mode tap
+sudo ip link set dev "$TAP_DEV" address "$TAP_MAC"  # Set the MAC address
 sudo ip addr add "${TAP_IP}${MASK_SHORT}" dev "$TAP_DEV"
 sudo ip link set dev "$TAP_DEV" up
 
 # Enable ip forwarding
 sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
-HOST_IFACE="eno1"
+HOST_IFACE="eno49np0"
 
 # Set up microVM internet access
 sudo iptables -t nat -D POSTROUTING -o "$HOST_IFACE" -j MASQUERADE || true
@@ -51,7 +53,7 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 
 ###
 
-KERNEL="./ubuntu/vmlinux-6.1.103"
+KERNEL="./ubuntu/vmlinux-5.10.210"
 KERNEL_BOOT_ARGS="console=ttyS0 reboot=k panic=1 pci=off"
 
 ARCH=$(uname -m)

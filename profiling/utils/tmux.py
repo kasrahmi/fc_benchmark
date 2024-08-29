@@ -12,7 +12,7 @@ class Tmux:
         subprocess.run(f'tmux kill-session -t {session_name}', shell=True)
     
     def run_command_in_session(session_name: str, command: str) -> None:
-        subprocess.run(f'tmux send-keys -t {session_name} "{command}" Enter', shell=True)
+        subprocess.run(f'tmux send -t {session_name} "{command}" Enter', shell=True)
 
     def capture_last_stdout_line(session_name: str) -> str:
         command = f'tmux capture-pane -t {session_name} -p'
