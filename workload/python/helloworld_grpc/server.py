@@ -1,39 +1,30 @@
 from concurrent import futures
-import logging
 
+import argparse
 import grpc
 import helloworld_pb2
 import helloworld_pb2_grpc
 
-import pyaes
-import time
 
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
-    def AESModeCTR(self, plaintext):
-        KEY = "6368616e676520746869732070617373"
-        KEY = KEY.encode(encoding = 'UTF-8')
-        counter = pyaes.Counter(initial_value = 0)
-        aes = pyaes.AESModeOfOperationCTR(KEY, counter = counter)
-        ciphertext = aes.encrypt(plaintext)
-        return ciphertext
-
     def SayHello(self, request, context):
-        plaintext = "example_string"
-        ciphertext = self.AESModeCTR(plaintext)
-        # print(f"AES | plaintext: {plaintext} | ciphertext = {ciphertext}")
-        return helloworld_pb2.HelloReply(message="Hello, %s!" % ciphertext)
+        msg = "Hello, %s!" % request.name
+        return helloworld_pb2.HelloReply(message=msg)
 
 
-def serve():
-    port = "50051"
+def serve(addr, port):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
     helloworld_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
-    server.add_insecure_port("172.16.0.2:" + port)
+    server.add_insecure_port(f"{addr}:{port}")
     server.start()
     print("Server started, listening on " + port)
     server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    logging.basicConfig()
-    serve()
+    parser = argparse.ArgumentParser(description='gRPC client for image rotation')
+    parser.add_argument('-a', '--addr', type=str, default="172.16.0.2", help='Server IP address')
+    parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
+    args = parser.parse_args()
+    
+    serve(args.addr, args.port)

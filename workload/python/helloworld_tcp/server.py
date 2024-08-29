@@ -17,8 +17,8 @@ def start_server(host='172.16.0.2', port=50051):
                     if not data:
                         break
                     name = data.decode('utf-8')
-                    response = f'hello, {name}'
-                    conn.sendall(response.encode('utf-8'))
+                    msg = f'hello, {name}'
+                    conn.sendall(msg.encode('utf-8'))
 
 if __name__ == "__main__":
     start_server()
