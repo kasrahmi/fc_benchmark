@@ -13,7 +13,7 @@ sudo ip link set dev "$TAP_DEV" up
 # Enable ip forwarding
 sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
-HOST_IFACE="eno49np0"
+HOST_IFACE="eno1"
 
 # Set up microVM internet access
 sudo iptables -t nat -D POSTROUTING -o "$HOST_IFACE" -j MASQUERADE || true
@@ -53,7 +53,7 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 
 ###
 
-KERNEL="./ubuntu/vmlinux-5.10.210"
+KERNEL="./ubuntu/vmlinux-6.1.102"
 KERNEL_BOOT_ARGS="console=ttyS0 reboot=k panic=1 pci=off"
 
 ARCH=$(uname -m)

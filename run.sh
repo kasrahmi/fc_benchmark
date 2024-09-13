@@ -26,6 +26,6 @@
 # python profiling/runner.py -l python -e helloworld_tcp --loop 10
 # python profiling/runner.py -l python -e aes --loop 10
 # python profiling/runner.py -l python -e image_rotate --loop 10
-python profiling/runner.py -l python -e lr_serving --loop 10
+# python profiling/runner.py -l python -e lr_serving --loop 10
 
 

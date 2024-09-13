@@ -1,13 +1,19 @@
 # How to setup VM
 
-## 1. Run Firecracker VM and SSH into it
+## 1. Run Firecracker VMM and VM, and SSH into it
 ```bash
+# Run Firecracker VMM
+bash scripts/fc_vmm.sh
+
+# Run Firecracker VM
 bash scripts/run_fc.sh
 ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2
 ```
 
 ## 2. Setup dependencies
-### Install pheripherals
+### Install Python Dependencies 
+
+Run below on both Firecracker VM and Host OS
 
 ```bash
 touch /var/lib/dpkg/status
@@ -23,4 +29,10 @@ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 nvm install --lts
+```
+
+### Move Workload to VM
+
+```bash
+rsync -Pav -e "ssh -i ./ubuntu/ubuntu-22.04.id_rsa" workload root@172.16.0.2:/root/.
 ```
