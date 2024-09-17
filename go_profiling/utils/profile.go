@@ -78,24 +78,32 @@ func (m *MemoryProfiler) WarmupServer(loop int) {
     failCount := 0
     for successCount < loop && failCount < loop {
         log.Printf("Warming up %d/%d", successCount, loop)
-        returnCode := m.InvokeServer()
-        if returnCode == 0 {
-            successCount++
-        } else {
+        output, err := m.InvokeServer()
+        if err != nil {
+            log.Printf("Failed to invoke server: %v\n", err)
             failCount++
+        } else {
+            log.Printf("Server response during warmup: %s\n", output)
+            successCount++
         }
         time.Sleep(5 * time.Second)
     }
 }
 
-func (m *MemoryProfiler) InvokeServer() int {
+func (m *MemoryProfiler) InvokeServer() (string, error) {
     log.Println("Invoking server")
+    
+    // Create the command for client invocation
     cmd := exec.Command("bash", "-c", m.ClientCommand)
-    err := cmd.Run()
+    
+    // Capture the output of the command
+    output, err := cmd.Output()
     if err != nil {
-        return 1
+        return "", fmt.Errorf("server invocation failed: %v", err)
     }
-    return 0
+
+    // Convert the byte output to a string and return it
+    return string(output), nil
 }
 
 func (m *MemoryProfiler) TakeSnapshot() {

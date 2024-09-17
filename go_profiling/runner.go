@@ -46,7 +46,12 @@ func Run(language string, experiment string, loop int) {
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetStableMemoryPage(120, 15)))
 		log.Printf("Server memory page: %v\n", memoryPage[0])
 
-		profiler.InvokeServer()
+		output, err := profiler.InvokeServer()
+		if err != nil {
+			log.Printf("Error invoking server: %v\n", err)
+		} else {
+			log.Printf("Server response: %s\n", output)
+		}
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetStableMemoryPage(30, 15)))
 		memoryPage0, err := strconv.Atoi(memoryPage[0])
 		if err != nil {

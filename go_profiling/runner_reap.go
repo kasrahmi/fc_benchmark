@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 	"fc_benchmark/utils" // Adjust the import path to your utils package
 )
 
@@ -46,11 +47,15 @@ func RunReap() {
 
 		// Retry until server returns successfully
 		for {
-			returnCode := profiler.InvokeServer()
-			if returnCode == 0 {
-				break
+			output, err := profiler.InvokeServer()
+			if err == nil {
+				log.Printf("Server response: %s\n", output)
+				break // Exit the loop on success
 			}
+			
+			log.Printf("Error invoking server: %v\n", err)
 			log.Println("Retrying ...")
+			time.Sleep(5 * time.Second) // Add a small delay before retrying
 		}
 		log.Println("Response returned")
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetCurrentMemoryPage()))
