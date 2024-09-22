@@ -1,6 +1,6 @@
 UFFD_SOCKET="/tmp/firecracker-uffd.socket"
 TAP_DEV="tap0"
-TAP_IP="172.16.0.1"
+TAP_IP="192.168.0.1"
 MASK_SHORT="/30"
 
 # Setup network interface
@@ -12,7 +12,7 @@ sudo ip link set dev "$TAP_DEV" up
 # Enable ip forwarding
 sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
-HOST_IFACE="eno49np0"
+HOST_IFACE="eno1"
 
 # Set up microVM internet access
 sudo iptables -t nat -D POSTROUTING -o "$HOST_IFACE" -j MASQUERADE || true

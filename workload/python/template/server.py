@@ -27,7 +27,7 @@ def serve(addr, port):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='gRPC client for image rotation')
-    parser.add_argument('-a', '--addr', type=str, default="172.16.0.2", help='Server IP address')
+    parser.add_argument('-a', '--addr', type=str, default="192.168.0.2", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     args = parser.parse_args()
     

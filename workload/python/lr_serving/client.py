@@ -12,7 +12,7 @@ def run(addr, port, name):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='gRPC client')
-    parser.add_argument('-a', '--addr', type=str, default="172.16.0.2", help='Server IP address')
+    parser.add_argument('-a', '--addr', type=str, default="192.168.0.2", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     parser.add_argument('-n', '--name', type=str, default="you", help='Name of the image file to rotate')
     

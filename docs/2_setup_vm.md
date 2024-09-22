@@ -7,7 +7,7 @@ bash scripts/fc_vmm.sh
 
 # Run Firecracker VM
 bash scripts/run_fc.sh
-ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2
+ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@192.168.0.2
 ```
 
 ## 2. Setup dependencies
@@ -19,7 +19,7 @@ Run below on both Firecracker VM and Host OS
 touch /var/lib/dpkg/status
 apt-get update
 apt-get install -y build-essential python3-pip htop git wget vim net-tools rsync
-pip3 install grpcio grpcio-tools pyaes boto3 pillow scikit-learn
+pip3 install grpcio grpcio-tools pyaes boto3 pillow scikit-learn pandas
 ```
 
 ### Install Node
@@ -34,5 +34,5 @@ nvm install --lts
 ### Move Workload to VM
 
 ```bash
-rsync -Pav -e "ssh -i ./ubuntu/ubuntu-22.04.id_rsa" workload root@172.16.0.2:/root/.
+rsync -Pav -e "ssh -i ./ubuntu/ubuntu-22.04.id_rsa" workload root@192.168.0.2:/root/.
 ```

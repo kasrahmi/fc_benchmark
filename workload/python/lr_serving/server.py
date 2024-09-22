@@ -21,7 +21,7 @@ def cleanup(sentence):
     sentence = cleanup_re.sub(' ', sentence).strip()
     return sentence
 
-dataset = pd.read_csv('./dataset.csv')
+dataset = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dataset.csv'))
 #dataset = pd.read_csv('/var/local/dir/dataset.csv')
 df_input = pd.DataFrame()
 dataset['train'] = dataset['Text'].apply(cleanup)
@@ -31,7 +31,7 @@ df_input['x'] = [x]
 df_input['x'] = df_input['x'].apply(cleanup)
 X = tfidf_vect.transform(df_input['x'])
 
-model = joblib.load('./lr_model.pk')
+model = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lr_model.pk'))
 print('Model is ready')
 
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
@@ -54,7 +54,7 @@ def serve(addr, port):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='gRPC client for image rotation')
-    parser.add_argument('-a', '--addr', type=str, default="172.16.0.2", help='Server IP address')
+    parser.add_argument('-a', '--addr', type=str, default="192.168.0.2", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     args = parser.parse_args()
     

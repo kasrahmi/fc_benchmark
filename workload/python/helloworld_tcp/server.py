@@ -2,7 +2,7 @@ import socket
 import ctypes
 import time
 
-def start_server(host='172.16.0.2', port=50051):
+def start_server(host='192.168.0.2', port=50051):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, port))
         s.listen()

@@ -23,18 +23,18 @@ class FirecrackerVM():
         subprocess.run(f"bash {constants.SCRIPTS_PATH}/run_fc.sh", shell=True)
 
     def stop_vm(self) -> None:
-        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@172.16.0.2 'reboot'", shell=True)
+        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@192.168.0.2 'reboot'", shell=True)
         time.sleep(15)
 
     def run_command_on_vm(self, command: str) -> None:
-        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@172.16.0.2 '{command}'", shell=True)
+        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@192.168.0.2 '{command}'", shell=True)
     
     def run_command_on_vm_tmux(self, command: str) -> None:
-        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@172.16.0.2 tmux kill-session -t server", shell=True)
+        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@192.168.0.2 tmux kill-session -t server", shell=True)
         time.sleep(1)
-        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@172.16.0.2 tmux new -s server -d", shell=True)
+        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@192.168.0.2 tmux new -s server -d", shell=True)
         time.sleep(1)
-        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@172.16.0.2 tmux send -t server '\"{command}\"' ENTER", shell=True)
+        subprocess.run(f"ssh -i {constants.UBUBTU_PATH}/ubuntu-22.04.id_rsa root@192.168.0.2 tmux send -t server '\"{command}\"' ENTER", shell=True)
     
     def snapshot_vm(self) -> None:
         subprocess.run(f"bash {constants.SCRIPTS_PATH}/snapshot_capture.sh", shell=True)

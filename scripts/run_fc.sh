@@ -1,5 +1,5 @@
 TAP_DEV="tap0"
-TAP_IP="172.16.0.1"
+TAP_IP="192.168.0.1"
 MASK_SHORT="/30"
 TAP_MAC="52:82:10:11:19:3b"
 
@@ -72,17 +72,17 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 
 ROOTFS="./ubuntu/ubuntu-22.04.ext4"
 
-# # Set vsock
-# VSOCK_DIR="/tmp/v.sock"
-# sudo rm ${VSOCK_DIR}
-# sudo curl --unix-socket "${API_SOCKET}" -i \
-#     -X PUT 'http://localhost/vsock' \
-#     -H 'Accept: application/json' \
-#     -H 'Content-Type: application/json' \
-#     -d '{
-#         "guest_cid": 3,
-#         "uds_path": "'${VSOCK_DIR}'"
-#     }'
+# Set vsock
+VSOCK_DIR="./v.sock"
+sudo rm ${VSOCK_DIR}
+curl --unix-socket "${API_SOCKET}" -i \
+    -X PUT 'http://localhost/vsock' \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "guest_cid": 3,
+        "uds_path": "'${VSOCK_DIR}'"
+    }'
 
 # Set rootfs
 sudo curl -X PUT --unix-socket "${API_SOCKET}" \
@@ -97,7 +97,8 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 # The IP address of a guest is derived from its MAC address with
 # `fcnet-setup.sh`, this has been pre-configured in the guest rootfs. It is
 # important that `TAP_IP` and `FC_MAC` match this.
-FC_MAC="06:00:AC:10:00:02"
+# FC_MAC="06:00:AC:10:00:02"
+FC_MAC="06:00:C0:A8:00:02" # 192.168.0.2
 
 # Set network interface
 sudo curl -X PUT --unix-socket "${API_SOCKET}" \
@@ -124,16 +125,16 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 sleep 5s
 
 # Setup internet access in the guest
-ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2  "ip route add default via 172.16.0.1 dev eth0"
+ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@192.168.0.2  "ip route add default via 192.168.0.1 dev eth0"
 
 # Setup DNS resolution in the guest
-ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2  "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@192.168.0.2  "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
 
 # Create apt file 
-# ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2  "touch /var/lib/dpkg/status"
+# ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@192.168.0.2  "touch /var/lib/dpkg/status"
 
 # SSH into the microVM
-# ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@172.16.0.2
+# ssh -i ./ubuntu/ubuntu-22.04.id_rsa root@192.168.0.2
 
 # Use `root` for both the login and password.
 # Run `reboot` to exit.

@@ -1,7 +1,7 @@
 const net = require('net');
 
 // Configuration
-const host = '172.16.0.2';
+const host = '192.168.0.2';
 const port = 50051;
 const name = 'John';
 

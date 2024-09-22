@@ -8,4 +8,4 @@ bash ../firecracker/resources/rebuild.sh
 cp ../firecracker/resources/x86_64/* ubuntu/.
 
 
-ssh-keygen -f "/users/nehalem/.ssh/known_hosts" -R "172.16.0.2"
+ssh-keygen -f "/users/nehalem/.ssh/known_hosts" -R "192.168.0.2"

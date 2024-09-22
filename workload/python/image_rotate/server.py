@@ -48,7 +48,7 @@ def save_image_path(image_path):
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
         filename = request.name
-        file_dir = os.path.join("../../temp", filename)
+        file_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", filename)
         save_dir, save_name = save_image_path(file_dir)
         print(f"filedir: {file_dir}")
         s3_client = boto3.client('s3')
@@ -77,7 +77,7 @@ def serve(addr, port):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='gRPC client for image rotation')
-    parser.add_argument('-a', '--addr', type=str, default="172.16.0.2", help='Server IP address')
+    parser.add_argument('-a', '--addr', type=str, default="192.168.0.2", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     args = parser.parse_args()
     

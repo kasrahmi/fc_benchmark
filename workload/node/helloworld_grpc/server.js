@@ -44,7 +44,7 @@ function sayHello(call, callback) {
 function main() {
   var server = new grpc.Server();
   server.addService(hello_proto.Greeter.service, {sayHello: sayHello});
-  server.bindAsync('172.16.0.2:50051', grpc.ServerCredentials.createInsecure(), () => {
+  server.bindAsync('192.168.0.2:50051', grpc.ServerCredentials.createInsecure(), () => {
     server.start();
   });
 }

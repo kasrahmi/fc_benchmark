@@ -24,7 +24,7 @@ using helloworld::Greeter;
 using helloworld::HelloReply;
 using helloworld::HelloRequest;
 
-ABSL_FLAG(std::string, addr, "172.16.0.2", "Server address");
+ABSL_FLAG(std::string, addr, "192.168.0.2", "Server address");
 ABSL_FLAG(int, port, 50051, "Server port");
 
 // Logic and data behind the server's behavior.

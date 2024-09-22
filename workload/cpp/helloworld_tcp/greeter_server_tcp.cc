@@ -7,7 +7,7 @@
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 
-ABSL_FLAG(std::string, addr, "172.16.0.2", "Server address");
+ABSL_FLAG(std::string, addr, "192.168.0.2", "Server address");
 ABSL_FLAG(int, port, 50051, "Server port");
 
 void RunServer(const std::string& ip, int port) {

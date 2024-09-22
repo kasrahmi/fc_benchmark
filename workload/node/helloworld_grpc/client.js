@@ -39,7 +39,7 @@ function main() {
   if (argv.target) {
     target = argv.target;
   } else {
-    target = '172.16.0.2:50051';
+    target = '192.168.0.2:50051';
   }
   var client = new hello_proto.Greeter(target,
                                        grpc.credentials.createInsecure());
