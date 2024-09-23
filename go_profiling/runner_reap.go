@@ -2,28 +2,21 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"os"
 	"strconv"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/JooyoungPark73/fc_benchmark/go_profiling/utils"
 )
 
-func RunReap() {
-	// Command-line arguments
-	language := flag.String("language", "", "Program language")
-	experiment := flag.String("expr", "", "Experiment name")
-	loop := flag.Int("loop", 1, "Number of experiment loop")
-	flag.Parse()
-
-	// CSV file for results
-	filePath := utils.Log_Path + "/reap_" + *language + "_" + *experiment + "_memory.csv"
+func RunReap(language string, experiment string, loop int) {
+	filePath := utils.Log_Path + "/reap_" + language + "_" + experiment + "_memory.csv"
 	file, err := os.Create(filePath)
+	logger := log.WithFields(log.Fields{"language": language, "experiment": experiment})
+
 	if err != nil {
-		log.Fatalf("Failed to create CSV file: %v", err)
+		logger.Fatalf("Failed to create CSV file: %v", err)
 	}
 	defer file.Close()
 
@@ -34,14 +27,13 @@ func RunReap() {
 	writer.Write([]string{"Memory"})
 
 	// Loop through experiments
-	for i := 0; i < *loop; i++ {
-		log.Infof("Loop: %d/%d\n", i+1, *loop)
+	for i := 0; i < loop; i++ {
+		logger.Infof("Loop: %d/%d\n", i+1, loop)
 		memoryPage := []string{}
 
-		profiler, _ := utils.NewMemoryProfiler(*language, *experiment, "", "")
+		profiler, _ := utils.NewMemoryProfiler(language, experiment, "", "")
 		profiler.GracefullyStopFCVM()
 		profiler.StartNewVM()
-
 		profiler.RunServer()
 		profiler.WarmupServer(10)
 		profiler.TakeSnapshot()
@@ -51,17 +43,16 @@ func RunReap() {
 		for {
 			output, err := profiler.InvokeServer()
 			if err == nil {
-				log.Infof("Server response: %s\n", output)
+				logger.Infof("Server response: %s\n", output)
 				break // Exit the loop on success
 			}
 
-			log.Infof("Error invoking server: %v\n", err)
-			log.Infof("Retrying ...")
-			time.Sleep(5 * time.Second) // Add a small delay before retrying
+			logger.Infof("Error invoking server: %v\n", err)
+			logger.Infof("Retrying ...")
 		}
-		log.Infof("Response returned")
+		logger.Infof("Response returned")
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetCurrentMemoryPage()))
-		log.Infof("Req memory page: %s\n", memoryPage[0])
+		logger.Infof("Req memory page: %s\n", memoryPage[0])
 
 		profiler.GracefullyStopFCVM()
 

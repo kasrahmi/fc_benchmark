@@ -18,6 +18,7 @@ func main() {
 	experiment := flag.String("e", "helloworld_grpc", "Experiment")
 	loop := flag.Int("loop", 1, "Number of loops")
 	verbosity := flag.String("verbosity", "info", "Logging verbosity - choose from [info, debug, trace]")
+	profiling := flag.String("profiling", "stable", "Profiling type - choose from [stable, reap]")
 	flag.Parse()
 
 	log.SetFormatter(&log.TextFormatter{
@@ -36,7 +37,14 @@ func main() {
 	}
 
 	// Call Run function
-	Run(*language, *experiment, *loop)
+	switch *profiling {
+	case "reap":
+		RunReap(*language, *experiment, *loop)
+	case "stable":
+		Run(*language, *experiment, *loop)
+	default:
+		log.Fatalf("Invalid profiling type: %s", *profiling)
+	}
 }
 
 func Run(language string, experiment string, loop int) {
