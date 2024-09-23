@@ -1,8 +1,9 @@
+API_SOCKET="/tmp/firecracker.socket"
 UFFD_SOCKET="/tmp/firecracker-uffd.socket"
 
 # Pause vm for snapshotting
 
-sudo curl --unix-socket /tmp/firecracker.socket -i \
+curl --unix-socket "${API_SOCKET}" -i \
 -X PATCH 'http://localhost/vm' \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
@@ -19,7 +20,7 @@ sleep 1s
 
 
 # Capture full snapshot
-sudo curl --unix-socket /tmp/firecracker.socket -i \
+curl --unix-socket "${API_SOCKET}" -i \
     -X PUT 'http://localhost/snapshot/create' \
     -H  'Accept: application/json' \
     -H  'Content-Type: application/json' \
@@ -30,7 +31,7 @@ sudo curl --unix-socket /tmp/firecracker.socket -i \
     }'
 
 # # Capture diff snapshot
-# sudo curl --unix-socket /tmp/firecracker.socket -i \
+# curl --unix-socket "${API_SOCKET}" -i \
 #     -X PUT 'http://localhost/snapshot/create' \
 #     -H  'Accept: application/json' \
 #     -H  'Content-Type: application/json' \
@@ -46,7 +47,7 @@ sleep 1s
 
 # resume paused vm
 
-sudo curl --unix-socket /tmp/firecracker.socket -i \
+curl --unix-socket "${API_SOCKET}" -i \
     -X PATCH 'http://localhost/vm' \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \

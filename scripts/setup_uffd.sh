@@ -5,4 +5,4 @@ sudo rm -f $UFFD_SOCKET
 
 tmux new -s fc_uffd -d
 
-tmux send -t fc_uffd "sudo ./bin/uffd_valid_count_handler ${UFFD_SOCKET} ./snapshot/mem_file" ENTER
+tmux send -t fc_uffd "./bin/uffd_valid_count_handler ${UFFD_SOCKET} ./snapshot/mem_file" ENTER

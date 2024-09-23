@@ -31,7 +31,7 @@ LOGFILE="./firecracker.log"
 touch $LOGFILE
 
 # Set log file
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"log_path\": \"${LOGFILE}\",
         \"level\": \"Debug\",
@@ -43,7 +43,7 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 ###
 
 # Set machine configuration
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"vcpu_count\": 2,
         \"mem_size_mib\": 1024,
@@ -63,7 +63,7 @@ if [ ${ARCH} = "aarch64" ]; then
 fi
 
 # Set boot source
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"kernel_image_path\": \"${KERNEL}\",
         \"boot_args\": \"${KERNEL_BOOT_ARGS}\"
@@ -75,7 +75,7 @@ ROOTFS="./ubuntu/ubuntu-22.04.ext4"
 # Set vsock
 VSOCK_DIR="./v.sock"
 sudo rm ${VSOCK_DIR}
-sudo curl --unix-socket "${API_SOCKET}" -i \
+curl --unix-socket "${API_SOCKET}" -i \
     -X PUT 'http://localhost/vsock' \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
@@ -85,7 +85,7 @@ sudo curl --unix-socket "${API_SOCKET}" -i \
     }'
 
 # Set rootfs
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"drive_id\": \"rootfs\",
         \"path_on_host\": \"${ROOTFS}\",
@@ -101,7 +101,7 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 FC_MAC="06:00:C0:A8:00:02" # 192.168.0.2
 
 # Set network interface
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"iface_id\": \"net1\",
         \"guest_mac\": \"$FC_MAC\",
@@ -114,7 +114,7 @@ sudo curl -X PUT --unix-socket "${API_SOCKET}" \
 sleep 0.015s
 
 # Start microVM
-sudo curl -X PUT --unix-socket "${API_SOCKET}" \
+curl -X PUT --unix-socket "${API_SOCKET}" \
     --data "{
         \"action_type\": \"InstanceStart\"
     }" \

@@ -1,3 +1,4 @@
+API_SOCKET="/tmp/firecracker.socket"
 UFFD_SOCKET="/tmp/firecracker-uffd.socket"
 TAP_DEV="tap0"
 TAP_IP="192.168.0.1"
@@ -30,7 +31,7 @@ tmux kill-session -t uffd_handler
 sudo rm /tmp/firecracker-uffd.socket
 tmux new -s uffd_handler -d
 # tmux send -t uffd_handler "sudo ./bin/uffd_valid_count_periodic_handler ${UFFD_SOCKET} ./snapshot/mem_file" ENTER
-tmux send -t uffd_handler "sudo ./bin/uffd_valid_count_handler ${UFFD_SOCKET} ./snapshot/mem_file" ENTER
+tmux send -t uffd_handler "./bin/uffd_valid_count_handler ${UFFD_SOCKET} ./snapshot/mem_file" ENTER
 
 # sudo ./uffd_valid_count_periodic_handler "${UFFD_SOCKET}" ./snapshot/mem_file &
 # tmux attach -t uffd_handler
@@ -39,7 +40,11 @@ sleep 5s
 
 # load snapshot with uffd
 echo "load snapshot"
-sudo curl --unix-socket /tmp/firecracker.socket -i \
+
+VSOCK_DIR="./v.sock"
+sudo rm ${VSOCK_DIR}
+
+curl --unix-socket "${API_SOCKET}" -i \
     -X PUT 'http://localhost/snapshot/load' \
     -H  'Accept: application/json' \
     -H  'Content-Type: application/json' \
@@ -57,7 +62,7 @@ sleep 5s
 
 # resume snapshot with uffd
 echo "resume vm"
-sudo curl --unix-socket /tmp/firecracker.socket -i \
+curl --unix-socket "${API_SOCKET}" -i \
     -X PATCH 'http://localhost/vm' \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
