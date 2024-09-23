@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/csv"
 	"flag"
-	"log"
 	"os"
 	"strconv"
 	"time"
-	"fc_benchmark/utils" // Adjust the import path to your utils package
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/JooyoungPark73/fc_benchmark/go_profiling/utils"
 )
 
 func RunReap() {
@@ -33,7 +35,7 @@ func RunReap() {
 
 	// Loop through experiments
 	for i := 0; i < *loop; i++ {
-		log.Printf("Loop: %d/%d\n", i+1, *loop)
+		log.Infof("Loop: %d/%d\n", i+1, *loop)
 		memoryPage := []string{}
 
 		profiler, _ := utils.NewMemoryProfiler(*language, *experiment, "", "")
@@ -49,17 +51,17 @@ func RunReap() {
 		for {
 			output, err := profiler.InvokeServer()
 			if err == nil {
-				log.Printf("Server response: %s\n", output)
+				log.Infof("Server response: %s\n", output)
 				break // Exit the loop on success
 			}
-			
-			log.Printf("Error invoking server: %v\n", err)
-			log.Println("Retrying ...")
+
+			log.Infof("Error invoking server: %v\n", err)
+			log.Infof("Retrying ...")
 			time.Sleep(5 * time.Second) // Add a small delay before retrying
 		}
-		log.Println("Response returned")
+		log.Infof("Response returned")
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetCurrentMemoryPage()))
-		log.Printf("Req memory page: %s\n", memoryPage[0])
+		log.Infof("Req memory page: %s\n", memoryPage[0])
 
 		profiler.GracefullyStopFCVM()
 

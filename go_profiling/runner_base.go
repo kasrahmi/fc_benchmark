@@ -4,11 +4,13 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
-	"fc_benchmark/utils" // Adjust the import path to where utils package is located
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/JooyoungPark73/fc_benchmark/go_profiling/utils"
 )
 
 // Main function for profiling
@@ -35,7 +37,7 @@ func RunBase() {
 
 	// Loop through experiments
 	for i := 0; i < *loop; i++ {
-		log.Printf("Loop: %d/%d\n", i+1, *loop)
+		log.Infof("Loop: %d/%d\n", i+1, *loop)
 		memoryPage := []string{}
 
 		// Base case
@@ -47,7 +49,7 @@ func RunBase() {
 		profiler.TakeSnapshot()
 		profiler.LoadSnapshot()
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetStableMemoryPage(120, 15)))
-		log.Printf("Server memory page: %s\n", memoryPage[0])
+		log.Infof("Server memory page: %s\n", memoryPage[0])
 
 		profiler.GracefullyStopFCVM()
 
@@ -60,7 +62,7 @@ func RunBase() {
 		profiler.TakeSnapshot()
 		profiler.LoadSnapshot()
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetStableMemoryPage(120, 15)))
-		log.Printf("Server memory page: %s\n", memoryPage[1])
+		log.Infof("Server memory page: %s\n", memoryPage[1])
 
 		profiler.GracefullyStopFCVM()
 

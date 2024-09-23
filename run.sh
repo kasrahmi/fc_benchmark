@@ -28,18 +28,7 @@
 # python profiling/runner.py -l python -e image_rotate --loop 10
 # python profiling/runner.py -l python -e lr_serving --loop 10
 
-bash scripts/fc_vmm.sh
-bash scripts/run_fc.sh
-go run go_profiling/runner.go -l python -e helloworld_grpc --loop 1
-
-bash scripts/fc_vmm.sh
-bash scripts/run_fc.sh
-go run go_profiling/runner.go -l python -e helloworld_tcp --loop 1
-
-bash scripts/fc_vmm.sh
-bash scripts/run_fc.sh
-go run go_profiling/runner.go -l python -e aes --loop 1
-
-#bash scripts/fc_vmm.sh
-#bash scripts/run_fc.sh
-#go run go_profiling/runner.go -l python -e lr_serving --loop 1
+# go run go_profiling/runner.go -l python -e helloworld_grpc --loop 1
+# go run go_profiling/runner.go -l python -e helloworld_tcp --loop 1
+# go run go_profiling/runner.go -l python -e aes --loop 1
+go run go_profiling/runner.go -l python -e lr_serving --loop 1

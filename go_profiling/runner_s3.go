@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/csv"
-	"log"
 	"os"
-	"time"
 	"strconv"
-	"fc_benchmark/utils"
+	"time"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/JooyoungPark73/fc_benchmark/go_profiling/utils"
 )
 
 func RunS3(language string, experiment string, loop int) {
@@ -21,7 +23,7 @@ func RunS3(language string, experiment string, loop int) {
 	writer.Write([]string{"get", "put", "get_put", "init", "init_get", "init_get_put"})
 
 	for i := 0; i < loop; i++ {
-		log.Printf("Loop: %d/%d\n", i+1, loop)
+		log.Infof("Loop: %d/%d\n", i+1, loop)
 		memoryPage := []string{}
 
 		// GET
@@ -33,7 +35,7 @@ func RunS3(language string, experiment string, loop int) {
 		time.Sleep(30 * time.Second)
 		profiler.TakeSnapshot()
 		profiler.LoadSnapshot()
-		
+
 		// Call the method on the profiler instance
 		memoryPage = append(memoryPage, strconv.Itoa(profiler.GetStableMemoryPage(30, 15)))
 
