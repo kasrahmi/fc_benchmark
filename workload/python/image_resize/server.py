@@ -12,7 +12,7 @@ from PIL import Image, ImageOps, ImageFilter
 def image_resize_function(load_image_path, save_image_path, size=(128,128)):
     try:
         img = Image.open(load_image_path)
-        
+
         # Resize the image
         resized_img = ImageOps.fit(img, size, Image.ANTIALIAS)
         
@@ -33,7 +33,7 @@ def download_file(file_dir, object_name, bucket, s3_client):
 def save_image_path(image_path):
     directory, filename = os.path.split(image_path)
     name, extension = os.path.splitext(filename)
-    new_filename = f"{name}_rotated{extension}"
+    new_filename = f"{name}_resized{extension}"
     save_image_path = os.path.join(directory, new_filename)
 
     return save_image_path, new_filename
