@@ -19,7 +19,7 @@ def image_resize_function(load_image_path, save_image_path, size=(128,128)):
         # Save the resized image
         resized_img.save(save_image_path)
     except Exception as e:
-        return f"python.image_rotate.ImageNotFound.Error:{e}"
+        return f"python.image_resize.ImageNotFound.Error:{e}"
 
 BUCKET_NAME = "jyp-benchmark"
 
@@ -49,7 +49,7 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
         # Download file from S3
         download_file(file_dir, filename, BUCKET_NAME, s3_client)
         
-        # Rotate Image
+        # Resize Image
         response = image_resize_function(file_dir, save_dir)
         
         # Upload Image
@@ -69,7 +69,7 @@ def serve(addr, port):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='gRPC client for image rotation')
+    parser = argparse.ArgumentParser(description='gRPC client for image resizing')
     parser.add_argument('-a', '--addr', type=str, default="192.168.0.2", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     args = parser.parse_args()
