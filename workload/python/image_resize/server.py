@@ -55,7 +55,7 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
         # Upload Image
         upload_file(save_dir, save_name, BUCKET_NAME, s3_client)
         
-        msg = "Hello, %s!" % request.name
+        msg = f"fn: ImageResize | image: {filename} | return msg: {response} | runtime: Python"
         return helloworld_pb2.HelloReply(message=msg)
 
 
