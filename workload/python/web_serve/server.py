@@ -7,8 +7,8 @@ import helloworld_pb2_grpc
 import boto3
 
 BUCKET_NAME = "jyp-benchmark"
-INPUT_FILE = "money.txt"
-OUTPUT_FILE = "output_money.txt"
+# INPUT_FILE = "money.txt"
+# OUTPUT_FILE = "output_money.txt"
 
 # AWS S3 file download
 def download_file(file_dir, object_name, bucket, s3_client):
@@ -32,19 +32,22 @@ def upload_file(file_dir, object_name, bucket, s3_client):
 
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
-        filename = request.name
-        input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", INPUT_FILE)
-        output_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", OUTPUT_FILE)
+        input_filename = request.name
+        # Generate the output file name based on the input file name
+        output_filename = os.path.splitext(input_filename)[0] + "_result.txt"
+
+        input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", input_filename)
+        output_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", output_filename)
         s3_client = boto3.client('s3')
 
         # Download the input file from S3
-        if not download_file(input_file_path, INPUT_FILE, BUCKET_NAME, s3_client):
+        if not download_file(input_file_path, input_filename, BUCKET_NAME, s3_client):
             return helloworld_pb2.HelloReply(message="Error: Unable to download input file.")
 
         try:
             # Open the input file, subtract 100 from the number, and save it to the output file
             with open(input_file_path, "r") as f:
-                number = float(f.read().strip())
+                number = float(f.read().strip())  # Use float to handle decimals
                 result = number - 100
             
             with open(output_file_path, "w") as f:
@@ -53,10 +56,10 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
             print(f"Processed input: {number}, result: {result}")
 
             # Upload the output file to S3
-            if not upload_file(output_file_path, OUTPUT_FILE, BUCKET_NAME, s3_client):
+            if not upload_file(output_file_path, output_filename, BUCKET_NAME, s3_client):
                 return helloworld_pb2.HelloReply(message="Error: Unable to upload output file.")
 
-            msg = f"Processed file: {filename} | Input: {number} | Result: {result}"
+            msg = f"Processed file: {input_filename} | Input: {number} | Result: {result} | Output saved as: {output_filename}"
         except Exception as e:
             msg = f"Error processing file: {e}"
 
