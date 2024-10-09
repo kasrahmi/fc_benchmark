@@ -44,7 +44,7 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
         try:
             # Open the input file, subtract 100 from the number, and save it to the output file
             with open(input_file_path, "r") as f:
-                number = int(f.read().strip())
+                number = float(f.read().strip())
                 result = number - 100
             
             with open(output_file_path, "w") as f:
