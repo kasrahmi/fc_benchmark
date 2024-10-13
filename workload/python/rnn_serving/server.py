@@ -66,7 +66,7 @@ def load_rnn_model():
         s3_client.download_fileobj(BUCKET_NAME, S3_MODEL_FILE, f)
     with open(S3_MODEL_FILE, "rb") as f:
         buffer = io.BytesIO(f.read())
-        rnn_model.load_state_dict(torch.load(buffer))
+        rnn_model.load_state_dict(torch.load(buffer, weights_only=True))
     rnn_model.eval()
     
     return rnn_model, all_categories, all_letters
