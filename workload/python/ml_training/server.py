@@ -1,91 +1,108 @@
 from concurrent import futures
-import os
 import argparse
 import grpc
+import psutil
+import os
+import pickle
+import re
+import pandas as pd
+from io import BytesIO
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+import boto3  # AWS SDK for Python (Boto3)
+
+# gRPC import for benchmark service
 import helloworld_pb2
 import helloworld_pb2_grpc
 
-import boto3
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-import time
-import pandas as pd
+# Initialize AWS S3 client
+s3_client = boto3.client('s3')  # specify your region
+bucket_name = "kasrahmi-benchmark"  # replace with your actual S3 bucket name
 
-BUCKET_NAME = "jyp-benchmark"
-TRAINING_FILE = "training_data.csv"  # Name of the dataset in the S3 bucket
+# Memory tracking setup
+pid = os.getpid()
+python_process = psutil.Process(pid)
+memory_use_old = 0
 
-# Function to generate synthetic data
-def generate_synthetic_data(num_samples=10000, num_features=100):
-    X = np.random.rand(num_samples, num_features)  # Features
-    y = np.random.randint(2, size=num_samples)     # Labels
-    return X, y
+# Text cleanup regex
+cleanup_re = re.compile('[^a-z]+')
 
-# Function to load real data from a CSV file
-def load_data_from_csv(file_dir):
-    data = pd.read_csv(file_dir)
-    X = data.iloc[:, :-1].values  # All columns except the last one as features
-    y = data.iloc[:, -1].values   # The last column as labels
-    return X, y
+def cleanup(sentence):
+    """Clean up text data for processing."""
+    sentence = sentence.lower()
+    sentence = cleanup_re.sub(' ', sentence).strip()
+    return sentence
 
-# Training function
-def train_model(X, y):
-    model = LogisticRegression()
-    start_time = time.time()
-    model.fit(X, y)
-    end_time = time.time()
-    return model, end_time - start_time
+def log_memory_usage(stage, file_append):
+    """Log memory usage after a specific stage."""
+    global memory_use_old
+    memory_use = python_process.memory_info()[0] / 2**20  # in MB
+    print(f'memory use {stage}: {memory_use - memory_use_old}', file=file_append)
+    memory_use_old = memory_use
 
-# AWS S3 file download
-def download_file(file_dir, object_name, bucket, s3_client):
-    try:
-        s3_client.download_file(bucket, object_name, file_dir)
-        print(f"Successfully downloaded {object_name} from {bucket}.")
-        return True
-    except Exception as e:
-        print(f"Error downloading {object_name} from S3: {e}")
-        return False
+def download_file(object_name, bucket, s3_client):
+    """Download file from AWS S3 directly into memory."""
+    response = s3_client.get_object(Bucket=bucket, Key=object_name)
+    return response.get('Body').read()
 
-# AWS S3 file upload
-def upload_file(file_dir, object_name, bucket, s3_client):
-    response = s3_client.upload_file(file_dir, bucket, object_name)
+def upload_file(object_name, bucket, s3_client, payload):
+    """Upload in-memory file data to AWS S3."""
+    response = s3_client.put_object(Bucket=bucket, Key=object_name, Body=payload)
+    return "success"
 
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
     def SayHello(self, request, context):
-        filename = request.name
-        file_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../temp", filename)
-        s3_client = boto3.client('s3')
+        """Run the benchmark processing within the SayHello method."""
+        file_append = open("../funcs.txt", "a")
+        
+        # Step 1: Log initial memory usage
+        log_memory_usage("initial", file_append)
 
-        # Try to download the dataset from S3
-        if download_file(file_dir, TRAINING_FILE, BUCKET_NAME, s3_client):
-            # Load real data from CSV
-            X, y = load_data_from_csv(file_dir)
-            print(f"Training on real data from S3: {TRAINING_FILE}")
-        else:
-            # Fallback to synthetic data
-            print("Falling back to synthetic data.")
-            X, y = generate_synthetic_data()
+        # Step 2: Download and process dataset
+        file_name = request.name
+        csv_data = download_file(file_name, bucket_name, s3_client)
+        data = BytesIO(csv_data)
+        df = pd.read_csv(data)
+        df['train'] = df['Text'].apply(cleanup)
+        
+        # Step 3: Log memory after data load
+        log_memory_usage("after data load", file_append)
 
-        # Train the model
-        model, train_time = train_model(X, y)
+        # Step 4: Train logistic regression model
+        model = LogisticRegression(max_iter=100)
+        tfidf_vectorizer = TfidfVectorizer(min_df=1000).fit(df['train'])
+        train_data = tfidf_vectorizer.transform(df['train'])
+        model.fit(train_data, df['Score'])
 
-        # (Optional) Upload the trained model to S3 if needed, or log the training time
-        msg = f"Model trained in {train_time:.4f} seconds using {'real' if os.path.exists(file_dir) else 'synthetic'} data!"
+        # Step 5: Serialize and upload model to S3
+        model_buffer = BytesIO()
+        pickle.dump(model, model_buffer)
+        model_buffer.seek(0)
+        upload_file("finalized_model.sav", bucket_name, s3_client, model_buffer.getvalue())
 
+        # Step 6: Log memory after training and upload
+        log_memory_usage("after model training and upload", file_append)
+        
+        file_append.close()
+
+        # Return gRPC response
+        msg = f"Hello, {request.name}! Benchmark completed successfully."
         return helloworld_pb2.HelloReply(message=msg)
 
-# gRPC server setup
 def serve(addr, port):
+    """Run gRPC server."""
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
     helloworld_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
     server.add_insecure_port(f"{addr}:{port}")
     server.start()
-    print(f"Server started, listening on {port}")
+    print(f"Server started, listening on {addr}:{port}")
     server.wait_for_termination()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='gRPC client for ml_training')
-    parser.add_argument('-a', '--addr', type=str, default="localhost", help='Server IP address')
+    parser = argparse.ArgumentParser(description='gRPC server for benchmark processing')
+    parser.add_argument('-a', '--addr', type=str, default="0.0.0.0", help='Server IP address')
     parser.add_argument('-p', '--port', type=str, default="50051", help='Server port number')
     args = parser.parse_args()
-
+    
     serve(args.addr, args.port)
+
