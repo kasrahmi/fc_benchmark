@@ -41,7 +41,7 @@ sleep 5s
 # load snapshot with uffd
 echo "load snapshot"
 
-VSOCK_DIR="./v.sock"
+VSOCK_DIR="/tmp/v.sock"
 sudo rm ${VSOCK_DIR}
 
 curl --unix-socket "${API_SOCKET}" -i \

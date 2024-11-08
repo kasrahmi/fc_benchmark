@@ -73,7 +73,7 @@ curl -X PUT --unix-socket "${API_SOCKET}" \
 ROOTFS="./ubuntu/ubuntu-22.04.ext4"
 
 # Set vsock
-VSOCK_DIR="./v.sock"
+VSOCK_DIR="/tmp/v.sock"
 sudo rm ${VSOCK_DIR}
 curl --unix-socket "${API_SOCKET}" -i \
     -X PUT 'http://localhost/vsock' \
